@@ -24,6 +24,16 @@ abstract class Animal {
     abstract String makeSound();
 }
 ```
+class Cat extends Animal {
+     public Cat (String name) {
+     super(name);
+     }
+
+    @Override
+    public String makeSound() {
+        return "Myau"; 
+    }
+}
 
 Створіть клас `Dog` як підклас `Animal` та реалізуйте метод `makeSound()`. Створіть клас `Cat` як підклас `Animal` та реалізуйте метод `makeSound()`. Створіть у методі `main()` об'єкти кожного з підкласів та викличте метод `makeSound()`.
 
@@ -41,7 +51,45 @@ interface Movable {
     void moveTo(double x, double y);
 }
 ```
+class Point implements Movable {
 
+    private double x;
+    private double y;
+
+    
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    
+    @Override
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    @Override
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    @Override
+    public double getX() {
+        return this.x;
+    }
+
+    @Override
+    public double getY() {
+        return this.y;
+    }
+
+    @Override
+    public void moveTo(double newX, double newY) {
+        this.x = newX;
+        this.y = newY;
+    }
+
+}
 ## Завдання 3. Клас Smartphone
 
 Напишіть вихідний код класу `Smartphone`, який реалізує такі інтерфейси
@@ -56,6 +104,33 @@ interface Cellular {
     void receiveCall();
 }
 ```
+
+class Smartphone implements GPS, Cellular {
+
+    private String model;
+
+
+    @Override
+    public double[] getCoordinates() {
+        double[] coords = {46.4858, 30.7437}; // Приклад координат
+        System.out.println("GPS: Визначено місцезнаходження.");
+        return coords;
+    }
+
+    // Реалізація методів з інтерфейсу Cellular
+    @Override
+    public void makeCall() {
+        System.out.println("Cellular: Вихідний дзвінок...");
+    }
+
+    @Override
+    public void receiveCall() {
+        System.out.println("Cellular: Вхідний дзвінок!");
+    }
+}
+
+
+
 
 ## Завдання 4. Інтерфейс Comparable
 
@@ -80,9 +155,182 @@ class Car {
 
 > Не використовуйте типізований `Comparable`! Для порівняння використовуйте лише арифметичні оператори.
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+
+class Car implements Comparable {
+
+    private int price;
+    private int year;
+    private int horsePower;
+
+
+    public Car(int price, int year, int horsePower) {
+        this.price = price;
+        this.year = year;
+        this.horsePower = horsePower;
+    }
+
+
+    public int getPrice() { return price; }
+    public void setPrice(int price) { this.price = price; }
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
+    public int getHorsePower() { return horsePower; }
+    public void setHorsePower(int horsePower) { this.horsePower = horsePower; }
+
+
+    @Override
+    public String toString() {
+        return "Car [Ціна=" + price + ", Рік=" + year + ", к.с.=" + horsePower + "]";
+    }
+
+
+    // Крок 3: Реалізуємо метод compareTo() згідно з нашою логікою
+    @Override
+    public int compareTo(Object o) {
+        // Обов'язкова перевірка типу, оскільки ми використовуємо нетипізований Comparable
+        if (!(o instanceof Car)) {
+            return 0; // Не можемо порівняти, вважаємо їх рівними
+        }
+        Car other = (Car) o; // Приведення типу до Car
+
+        // --- Логіка порівняння ---
+
+        // Правило 1: Спочатку порівнюємо ціну. "Більше" той, у кого ціна МЕНША.
+        // Це зворотний порядок, тому порівнюємо other.price з this.price
+        if (this.price != other.price) {
+            return other.price - this.price; // Якщо this.price=10, other.price=20, результат буде 10 (додатний) -> other "менший"
+        }
+        
+        // Якщо ціни однакові, переходимо до наступного правила
+        
+        // Правило 2: Порівнюємо рік випуску. "Більше" той, хто МОЛОДШИЙ (рік випуску більший).
+        // Це прямий порядок.
+        if (this.year != other.year) {
+            return this.year - other.year; // Якщо this.year=2020, other.year=2018, результат 2 (додатний) -> this "більший"
+        }
+
+        // Якщо і роки однакові, переходимо до останнього правила
+
+        // Правило 3: Порівнюємо кінські сили. "Більше" той, у кого їх БІЛЬШЕ.
+        // Це прямий порядок.
+        return this.horsePower - other.horsePower;
+    }
+}
+
+
+// Клас для демонстрації роботи сортування
+public class Main {
+public static void main(String[] args) {
+List<Car> cars = new ArrayList<>();
+cars.add(new Car(20000, 2018, 150));
+cars.add(new Car(15000, 2020, 180)); // Має бути першим (найнижча ціна)
+cars.add(new Car(20000, 2022, 190)); // Має бути другим (ціна як у першого, але рік новіший)
+cars.add(new Car(20000, 2018, 250)); // Має бути третім (ціна і рік як у першого, але кінських сил більше)
+cars.add(new Car(30000, 2019, 300));
+
+        System.out.println("Список до сортування:");
+        for (Car car : cars) {
+            System.out.println(car);
+        }
+
+        // Магія! Collections.sort використовує наш метод compareTo() для сортування
+        Collections.sort(cars);
+
+        System.out.println("\nСписок після сортування:");
+        for (Car car : cars) {
+            System.out.println(car);
+        }
+    }
+}
+
+
+
 ## Завдання 5. Додаток Draw
 
 Скопіюйте та модифікуйте додаток `Draw` з лабораторної роботи №4 таким чином, щоб додаток використовував механізм абстрактних класів.
+
+import java.awt.Point;
+import java.awt.Shape;
+
+/**
+* Це наше "креслення" або шаблон для всіх фігур, які можна намалювати.
+* Він містить спільні дані (точки) та оголошує спільну поведінку (getShape).
+  */
+  public abstract class AbstractShape {
+
+  // Поля, спільні для всіх фігур
+  protected Point startPoint;
+  protected Point endPoint;
+
+  // Конструктор для ініціалізації
+  public AbstractShape() {
+  this(new Point(0, 0), new Point(0, 0));
+  }
+
+  public AbstractShape(Point startPoint, Point endPoint) {
+  this.startPoint = startPoint;
+  this.endPoint = endPoint;
+  }
+
+  // --- АБСТРАКТНИЙ МЕТОД ---
+  // Це "контракт". Кожен дочірній клас (Rectangle, Ellipse)
+  // ЗОБОВ'ЯЗАНИЙ надати свою власну реалізацію цього методу.
+  // Він каже, ЯК саме перетворити startPoint та endPoint на конкретну фігуру java.awt.Shape.
+  public abstract Shape getShape();
+
+
+    // --- ЗВИЧАЙНІ МЕТОДИ ---
+    // Цей код однаковий для всіх, тому ми пишемо його тут один раз.
+    public void setStartPoint(Point startPoint) {
+        this.startPoint = startPoint;
+    }
+
+    public void setEndPoint(Point endPoint) {
+        this.endPoint = endPoint;
+    }
+}
+
+
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+
+// Rectangle ТЕПЕР є конкретною реалізацією нашого шаблону AbstractShape
+public class Rectangle extends AbstractShape {
+
+    // Реалізуємо "обіцянку" батьківського класу
+    @Override
+    public Shape getShape() {
+        // Логіка для створення прямокутника на основі двох точок
+        int x = Math.min(startPoint.x, endPoint.x);
+        int y = Math.min(startPoint.y, endPoint.y);
+        int width = Math.abs(startPoint.x - endPoint.x);
+        int height = Math.abs(startPoint.y - endPoint.y);
+        return new Rectangle2D.Float(x, y, width, height);
+    }
+}
+
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+
+// Ellipse - це також реалізація AbstractShape
+public class Ellipse extends AbstractShape {
+
+    @Override
+    public Shape getShape() {
+        // Логіка для створення еліпса (аналогічна до прямокутника)
+        int x = Math.min(startPoint.x, endPoint.x);
+        int y = Math.min(startPoint.y, endPoint.y);
+        int width = Math.abs(startPoint.x - endPoint.x);
+        int height = Math.abs(startPoint.y - endPoint.y);
+        return new Ellipse2D.Float(x, y, width, height);
+    }
+}
 
 ## Завдання 6. Додаток SortingList
 
